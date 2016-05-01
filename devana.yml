@@ -1,0 +1,22 @@
+---
+- hosts: servers
+  become: yes
+  gather_facts: no
+  pre_tasks:
+    - name: Install python2
+      raw: dnf -y install python-simplejson python2-dnf libselinux-python
+    - name: gather facts
+      setup:
+  roles:
+   - server
+
+- hosts: client
+  become: yes
+  gather_facts: no
+  pre_tasks:
+    - name: Install python2
+      raw: dnf -y install python-simplejson python2-dnf libselinux-python
+    - name: gather facts
+      setup:
+  roles:
+   - client

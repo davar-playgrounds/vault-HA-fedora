@@ -1,0 +1,23 @@
+---
+- name: Install consul
+  dnf: name=consul state=present
+
+- name: Add consul group
+  raw: getent group consul > /dev/null || groupadd -r consul
+
+- name: Add consul user
+  raw: getent passwd consul > /dev/null || useradd -m -r -g consul -d /var/lib/consul -s /sbin/nologin consul
+
+- name: Create consul config dir
+  file: path={{ consul_cfg_dir }} mode=775 state=directory owner=consul group=consul
+
+- name: Create consul data dir
+  file: path={{ consul_data_dir }}/data mode=775 state=directory owner=consul group=consul
+
+- name: Copy consul config file
+  template: src=cluster.json.j2 dest={{ consul_cfg_dir }}/cluster.json owner=consul group=consul
+  notify: Reload consul
+
+- name: Add consul systemd service
+  template: src=consul.service.j2 dest=/etc/systemd/system/consul.service owner=root group=root mode=0644
+  notify: Restart consul

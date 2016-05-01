@@ -1,0 +1,3 @@
+---
+- name: Install Software
+  dnf: name=consul state=present
