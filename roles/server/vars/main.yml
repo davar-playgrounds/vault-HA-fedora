@@ -6,10 +6,14 @@ server_ips:
 
 consul_interface: eth1
 
-consul_cfg_dir: /var/lib/consul/config.d
+consul_dir: /var/lib/consul
 
-consul_data_dir: /var/lib/consul/data
+consul_cfg_dir: "{{ consul_dir }}/config.d"
+
+consul_data_dir: "{{ consul_dir }}/data"
 
 consul_log_level: INFO
 
 consul_key: ZrWamm/G+TtnigcxX1EZiw==
+
+vault_dir: /var/lib/vault
