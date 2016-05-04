@@ -15,7 +15,7 @@
   group: name=vault
 
 - name: Add vault user
-  user: name=vault comment="vault user" group=vault createhome=yes shell=/sbin/nologin home={{ vault_dir }}
+  user: name=vault comment="vault user" group=vault createhome=yes shell=/bin/bash home={{ vault_dir }}
 
 - name: Create consul config dir
   file: path={{ consul_cfg_dir }} mode=775 state=directory owner=consul group=consul

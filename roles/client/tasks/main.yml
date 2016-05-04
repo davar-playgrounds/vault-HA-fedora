@@ -11,6 +11,12 @@
 - name: Add consul user
   user: name=consul comment="consul user" group=consul createhome=yes shell=/sbin/nologin home={{ consul_dir }}
 
+- name: Add vault group
+  group: name=vault
+
+- name: Add vault user
+  user: name=vault comment="vault user" group=vault createhome=yes shell=/bin/bash home={{ vault_dir }}
+
 - name: Create consul config dir
   file: path={{ consul_cfg_dir }} mode=775 state=directory owner=consul group=consul
 
@@ -34,3 +40,11 @@
   with_items: "{{groups['servers']}}"
   when: vault_init.rc == 0
   notify: Restart vault cluster
+
+- name: Deploy root token to vault user
+  template: src=root_token.j2 dest={{ vault_dir }}/.root_token owner=vault group=vault mode=0006
+  delegate_to: "{{item}}"
+  with_items: 
+        - "{{groups['servers']}}"
+        - client
+  when: vault_init.rc == 0

@@ -8,6 +8,8 @@ consul_interface: eth1
 
 consul_dir: /var/lib/consul
 
+vault_dir: /var/lib/vault
+
 consul_cfg_dir: "{{ consul_dir }}/config.d"
 
 consul_data_dir: "{{ consul_dir }}/data"
