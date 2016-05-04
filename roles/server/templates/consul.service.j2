@@ -12,6 +12,9 @@ ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 User=consul
 Group=consul
+Restart=always
+RestartSec=3
+TimeoutSec=60
 
 [Install]
 WantedBy=multi-user.target

@@ -23,3 +23,14 @@
 - name: Copy consul config file
   template: src=client.json.j2 dest={{ consul_cfg_dir }}/client.json owner=consul group=consul
   notify: Reload consul
+
+- name: Init vault
+  shell: /usr/local/bin/vault init -address=http://{{ server_ips.0 }}:8200 -key-shares=1 -key-threshold=1 
+  register: vault_init
+
+- name: Deploy vault keys
+  template: src=vault.j2 dest=/etc/sysconfig/vault owner=root group=root mode=0006
+  delegate_to: "{{item}}"
+  with_items: "{{groups['servers']}}"
+  when: vault_init.rc == 0
+  notify: Restart vault cluster

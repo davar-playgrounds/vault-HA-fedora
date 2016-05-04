@@ -11,16 +11,15 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "client" do |client|
     client.vm.network "private_network", ip: "192.168.100.104" 
-  end
-
-  config.vm.provision :ansible do |ansible|
-        ansible.groups = {
+    client.vm.provision :ansible do |ansible|
+	ansible.groups = {
                 "servers" => ["server1","server2","server3"],
                 "client" => ["client"],
-		"all_groups:children" => ["servers", "client"]
+                "all_groups:children" => ["servers", "client"]
         }
         ansible.playbook = "devana.yml"
-        #ansible.limit = "all"
+        ansible.limit = "all"
         ansible.verbose = "v"
+    end
   end
 end

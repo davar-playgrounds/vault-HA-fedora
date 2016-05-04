@@ -1,7 +1,6 @@
 ---
 - hosts: servers
   become: yes
-  serial: 1
   gather_facts: no
   pre_tasks:
     - name: Install python2

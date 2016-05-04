@@ -1,17 +1,20 @@
 [Unit]
 Description=vault server
-Requires=network-online.target
-After=network-online.target consul.service
+Requires=network-online.target consul.service
+After=consul.service
 
 [Service]
 EnvironmentFile=-/etc/sysconfig/vault
+Environment=GOMAXPROCS=2
 Restart=on-failure
 ExecStart=/usr/local/bin/vault server $OPTIONS -config={{ vault_dir }}/vault.conf
-ExecStartPost=/bin/bash -c "[ -z \"$KEYS\" ] || for key in $KEYS; do /usr/local/bin/vault unseal $CERT $key; done"
+ExecStartPost=/bin/bash -c "[ -z \"$KEYS\" ] || for key in $KEYS; do /usr/local/bin/vault unseal $CERT -address=$ADDRESS $key; done"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 User=vault
 Group=vault
+RestartSec=3
+TimeoutSec=60
 
 [Install]
 WantedBy=multi-user.target
