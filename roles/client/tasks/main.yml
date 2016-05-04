@@ -42,7 +42,7 @@
   notify: Restart vault cluster
 
 - name: Deploy root token to vault user
-  template: src=root_token.j2 dest={{ vault_dir }}/.root_token owner=vault group=vault mode=0600
+  template: src=vault-token.j2 dest={{ vault_dir }}/.vault-token owner=vault group=vault mode=0600
   delegate_to: "{{item}}"
   with_items: 
         - "{{groups['servers']}}"
