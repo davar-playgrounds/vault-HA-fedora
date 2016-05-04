@@ -35,14 +35,14 @@
   register: vault_init
 
 - name: Deploy vault keys
-  template: src=vault.j2 dest=/etc/sysconfig/vault owner=root group=root mode=0006
+  template: src=vault.j2 dest=/etc/sysconfig/vault owner=root group=root mode=0600
   delegate_to: "{{item}}"
   with_items: "{{groups['servers']}}"
   when: vault_init.rc == 0
   notify: Restart vault cluster
 
 - name: Deploy root token to vault user
-  template: src=root_token.j2 dest={{ vault_dir }}/.root_token owner=vault group=vault mode=0006
+  template: src=root_token.j2 dest={{ vault_dir }}/.root_token owner=vault group=vault mode=0600
   delegate_to: "{{item}}"
   with_items: 
         - "{{groups['servers']}}"
