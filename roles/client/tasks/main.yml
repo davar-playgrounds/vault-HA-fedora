@@ -17,6 +17,9 @@
 - name: Add vault user
   user: name=vault comment="vault user" group=vault createhome=yes shell=/bin/bash home={{ vault_dir }}
 
+- name: Insert vault address for admin
+  lineinfile: dest={{ vault_dir }}/.bashrc line="export VAULT_ADDR=http://{{ server_ips.0 }}:8200"  insertafter=EOF state=present
+
 - name: Create consul config dir
   file: path={{ consul_cfg_dir }} mode=775 state=directory owner=consul group=consul
 
@@ -31,20 +34,42 @@
   notify: Reload consul
 
 - name: Init vault
-  shell: /usr/local/bin/vault init -address=http://{{ server_ips.0 }}:8200 -key-shares=1 -key-threshold=1 
+  shell: /bin/su - vault -c "vault init -check >/dev/null 2>&1 || vault init -key-shares=1 -key-threshold=1"
   register: vault_init
 
-- name: Deploy vault keys
-  template: src=vault.j2 dest=/etc/sysconfig/vault owner=root group=root mode=0600
-  delegate_to: "{{item}}"
-  with_items: "{{groups['servers']}}"
-  when: vault_init.rc == 0
-  notify: Restart vault cluster
+- block: 
+        - name: Deploy vault keys
+          template: src=vault.j2 dest=/etc/sysconfig/vault owner=root group=root mode=0600
+          delegate_to: "{{item}}"
+          with_items: "{{groups['servers']}}"
 
-- name: Deploy root token to vault user
-  template: src=vault-token.j2 dest={{ vault_dir }}/.vault-token owner=vault group=vault mode=0600
-  delegate_to: "{{item}}"
-  with_items: 
-        - "{{groups['servers']}}"
-        - client
-  when: vault_init.rc == 0
+        - name: Deploy root token to vault user
+          template: src=vault-token.j2 dest={{ vault_dir }}/.vault-token owner=vault group=vault mode=0400
+          delegate_to: "{{item}}"
+          with_items: 
+                - "{{groups['servers']}}"
+                - client
+
+        - name: Restart vault cluster
+          service: name=vault.service state=restarted enabled=yes
+          delegate_to: "{{ item }}"
+          with_items: "{{groups['servers']}}"
+          register: vault_ready
+  when: vault_init.rc == 0 
+  
+
+
+- block:
+        - name: Create secret
+          command: /bin/su - vault -c "vault write /secret/foo value='Top secret!'"
+
+        - name: Copy policy
+          copy: source=policy.hcl dest=/tmp/policy.hcl mode=0644
+
+        - name: Create policy
+          command: /bin/su - vault -c "vault policy-write web /tmp/policy.hcl" removes=/tmp/policy.hcl 
+
+        - name: Create token
+          shell: /bin/su - vault -c "vault token-create -policy=web -no-default-policy"
+          register: web_token
+  when: vault_ready|success
