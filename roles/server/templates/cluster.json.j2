@@ -2,6 +2,8 @@
   "datacenter": "bgd1",
   "bind_addr": "{{ hostvars[inventory_hostname]['ansible_' + consul_interface]['ipv4']['address'] }}",
   "start_join": ["{{ server_ips.0 }}", "{{ server_ips.1 }}", "{{ server_ips.2 }}"],
+  "retry_join": ["{{ server_ips.0 }}", "{{ server_ips.1 }}", "{{ server_ips.2 }}"],
+  "rejoin_after_leave": true,
   "bootstrap_expect": 3,
   "data_dir": "{{ consul_data_dir }}",
   "enable_syslog": true,
