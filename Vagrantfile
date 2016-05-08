@@ -17,10 +17,10 @@ Vagrant.configure("2") do |config|
                 "client" => ["client"],
                 "all_groups:children" => ["servers", "client"]
         }
-        ansible.playbook = "devana.yml"
+        ansible.playbook = "demo.yml"
         ansible.limit = "all"
 	ansible.raw_ssh_args = ["-o ServerAliveInterval=20"]
-        ansible.verbose = "v"
+        #ansible.verbose = "v"
     end
   end
 end
