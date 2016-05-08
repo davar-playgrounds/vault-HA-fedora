@@ -17,3 +17,5 @@ consul_log_level: INFO
 consul_key: ZrWamm/G+TtnigcxX1EZiw==
 
 vault_dir: /var/lib/vault
+
+vault_address: "http://{{ hostvars[inventory_hostname]['ansible_' + consul_interface]['ipv4']['address'] }}:8200"

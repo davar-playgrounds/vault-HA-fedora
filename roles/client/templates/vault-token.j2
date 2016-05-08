@@ -1,1 +1,1 @@
-{{ vault_init.stdout_lines[1] | regex_replace('^.*: (.*)$', '\\1')  }}
+{{ vault_inited.stdout_lines[1] | regex_replace('^.*: (.*)$', '\\1')  }}

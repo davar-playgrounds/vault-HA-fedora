@@ -8,8 +8,6 @@ consul_interface: eth1
 
 consul_dir: /var/lib/consul
 
-vault_dir: /var/lib/vault
-
 consul_cfg_dir: "{{ consul_dir }}/config.d"
 
 consul_data_dir: "{{ consul_dir }}/data"
@@ -17,3 +15,12 @@ consul_data_dir: "{{ consul_dir }}/data"
 consul_log_level: INFO
 
 consul_key: ZrWamm/G+TtnigcxX1EZiw==
+
+vault_dir: /var/lib/vault
+
+vault_address: "http://{{ server_ips.0 }}:8200"
+
+vault_user: bugs        
+
+vault_password: bunny
+

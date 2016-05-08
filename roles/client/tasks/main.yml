@@ -1,41 +1,41 @@
 ---
-- name: Install consul
-  dnf: name=consul state=present
-
-- name: Install vault
-  unarchive: copy=no src=https://releases.hashicorp.com/vault/0.5.2/vault_0.5.2_linux_amd64.zip dest=/usr/local/bin mode=0755 owner=root group=root
- 
-- name: Add consul group
-  group: name=consul
-
-- name: Add consul user
-  user: name=consul comment="consul user" group=consul createhome=yes shell=/sbin/nologin home={{ consul_dir }}
-
-- name: Add vault group
-  group: name=vault
-
-- name: Add vault user
-  user: name=vault comment="vault user" group=vault createhome=yes shell=/bin/bash home={{ vault_dir }}
+- name: Install PHP staff and Apache
+  dnf: name={{ item }} state=present
+  with_items:
+        - php-pear-Net-Curl
+        - php-pecl-jsonc 
 
 - name: Insert vault address for admin
-  lineinfile: dest={{ vault_dir }}/.bashrc line="export VAULT_ADDR=http://{{ server_ips.0 }}:8200"  insertafter=EOF state=present
-
-- name: Create consul config dir
-  file: path={{ consul_cfg_dir }} mode=775 state=directory owner=consul group=consul
-
-- name: Create consul data dir
-  file: path={{ consul_data_dir }}/data mode=775 state=directory owner=consul group=consul
-
-- name: Add consul systemd service
-  template: src=consul.service.j2 dest=/etc/systemd/system/consul.service owner=root group=root mode=0644
+  lineinfile: dest={{ vault_dir }}/.bashrc line="export VAULT_ADDR={{ vault_address }}"  insertafter=EOF state=present
 
 - name: Copy consul config file
   template: src=client.json.j2 dest={{ consul_cfg_dir }}/client.json owner=consul group=consul
-  notify: Reload consul
+  register: consul_cfg
 
-- name: Init vault
-  shell: /bin/su - vault -c "vault init -check >/dev/null 2>&1 || vault init -key-shares=1 -key-threshold=1"
+- name: Consul service reload
+  service: name=consul.service state=reloaded enabled=yes
+  when: consul_cfg.changed
+
+- name: Allow Apache to connect
+  seboolean: name=httpd_can_network_connect state=yes persistent=yes
+
+- name: Apache service
+  service: name=httpd.service state=started enabled=yes
+
+- name: Deploy web page
+  template: src=secret.php.j2 dest=/var/www/html/secret.php owner=root group=root mode=0644
+
+- name: Check if vault was init
+  shell: /bin/su - vault -c "vault init -check >/dev/null 2>&1"
   register: vault_init
+  changed_when: vault_init.rc == 2
+  failed_when: vault_init.rc == 1
+  ignore_errors: yes
+  
+- name: Init vault
+  shell: /bin/su - vault -c "vault init -key-shares=1 -key-threshold=1"
+  register: vault_inited
+  when: vault_init.changed
 
 - block: 
         - name: Deploy vault keys
@@ -54,22 +54,18 @@
           service: name=vault.service state=restarted enabled=yes
           delegate_to: "{{ item }}"
           with_items: "{{groups['servers']}}"
-          register: vault_ready
-  when: vault_init.rc == 0 
-  
-
+  when: vault_inited.changed
 
 - block:
         - name: Create secret
           command: /bin/su - vault -c "vault write /secret/foo value='Top secret!'"
 
         - name: Copy policy
-          copy: source=policy.hcl dest=/tmp/policy.hcl mode=0644
+          copy: src=policy.hcl dest=/tmp/policy.hcl mode=0644
 
         - name: Create policy
           command: /bin/su - vault -c "vault policy-write web /tmp/policy.hcl" removes=/tmp/policy.hcl 
 
-        - name: Create token
-          shell: /bin/su - vault -c "vault token-create -policy=web -no-default-policy"
-          register: web_token
-  when: vault_ready|success
+        - name: Enable userpass auth and create account
+          shell: /bin/su - vault -c "vault auth-enable userpass ; vault write auth/userpass/users/{{ vault_user }} password={{ vault_password }} policies=web"
+  when: vault_init.rc != 1

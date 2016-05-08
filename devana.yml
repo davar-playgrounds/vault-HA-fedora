@@ -1,22 +1,21 @@
 ---
-- hosts: servers
+- hosts: all
   become: yes
   gather_facts: no
   pre_tasks:
-    - name: Install python2
+    - name: Prepare FC23 cloud box
       raw: dnf -y install python-simplejson python2-dnf libselinux-python unzip
     - name: gather facts
       setup:
+  roles:
+   - common
+
+- hosts: servers
+  become: yes
   roles:
    - server
 
 - hosts: client
   become: yes
-  gather_facts: no
-  pre_tasks:
-    - name: Install python2
-      raw: dnf -y install python-simplejson python2-dnf libselinux-python unzip
-    - name: gather facts
-      setup:
   roles:
    - client
