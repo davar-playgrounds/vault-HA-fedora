@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
         }
         ansible.playbook = "devana.yml"
         ansible.limit = "all"
+	ansible.raw_ssh_args = ["-o ServerAliveInterval=20"]
         ansible.verbose = "v"
     end
   end

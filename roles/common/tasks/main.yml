@@ -1,4 +1,9 @@
 ---
+- name: Prepare FC23 cloud box
+  raw: dnf -y install python-simplejson python2-dnf libselinux-python libsemanage-python unzip
+- name: gather facts
+  setup:
+
 - name: Install consul
   dnf: name=consul state=present
 
