@@ -1,7 +1,7 @@
 # vault-HA-fedora
 ## Introduction
 
-This demo uses Ansible to create Vault cluster using Consul cluster as HA capable backend. Clusters are deployed on the three cloud FC23 boxes hosted on Vagrant VMs. In addition, Apache HTTPD with PHP beside Consul client are installed on the fourth Vagrant VM serving a demo web page in order to demonstrate usage of Vault ("userpass" authentication used). A proper security assessment would need to be done for production deployment and required tasks accomplished accordingly (SSL all accross, firewall/iptables etc.).
+This demo uses Ansible to create Vault cluster using Consul cluster as HA capable backend. Clusters are deployed on the three cloud FC23 boxes hosted on Vagrant VMs. In addition, Apache HTTPD with PHP beside Consul client are installed on the fourth Vagrant VM serving a demo web page in order to demonstrate usage of Vault ("userpass" authentication used). A proper security assessment would need to be done for production deployment and required tasks accomplished accordingly (SSL all accross with cert verification, firewall/iptables etc.).
 
 ## Instructions
 
