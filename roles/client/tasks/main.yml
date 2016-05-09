@@ -81,15 +81,15 @@
           with_items: "{{groups['servers']}}"
   when: vault_inited.changed
 
-- name: Check vault service
-  shell: /usr/bin/dig +noall +answer vault.service.consul | awk '{print $5}'
-  register: vault_ip
-
 - name: Set vault address for vault user
-  lineinfile: 
+  lineinfile:
         dest={{ vault_dir }}/.bashrc line="export VAULT_ADDR=http://vault.service.consul:{{ vault_port }}"  
         insertafter=EOF 
         state=present
+
+- name: Check vault service
+  shell: /usr/bin/dig +noall +answer vault.service.consul | awk '{print $5}'
+  register: vault_ip
 
 - block:
         - name: Create secret
