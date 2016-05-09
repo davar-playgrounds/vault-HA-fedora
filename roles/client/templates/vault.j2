@@ -1,4 +1,4 @@
 OPTIONS=
 CERT=
-ADDRESS="http://{{ hostvars[item]['ansible_' + consul_interface]['ipv4']['address'] }}:8200"
+ADDRESS="http://{{ hostvars[item]['ansible_' + consul_interface]['ipv4']['address'] }}:{{ vault_port }}"
 KEYS="{{ vault_inited.stdout_lines[0] | regex_replace('^.*: (.*)$', '\\1')  }}"

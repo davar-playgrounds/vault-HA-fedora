@@ -1,13 +1,38 @@
 ---
-- name: Install PHP staff and Apache
+- name: Install required software
   dnf: name={{ item }} state=present
   with_items:
+        - bind-utils
+        - dnsmasq
         - php
         - php-pear-Net-Curl
         - php-pecl-jsonc 
 
-- name: Insert vault address for admin
-  lineinfile: dest={{ vault_dir }}/.bashrc line="export VAULT_ADDR={{ vault_address }}"  insertafter=EOF state=present
+- name: Add localhost to resolver
+  lineinfile: 
+        dest=/etc/dhcp/dhclient-eth0.conf 
+        line="prepend domain-name-servers 127.0.0.1;" 
+        create=yes 
+        state=present 
+        owner=root group=root mode=0644
+  register: dhclient_cfg
+
+- name: network service restart
+  service: name=network.service state=restarted enabled=yes
+  when: dhclient_cfg.changed
+
+- name: Create dnsmasq cfg file
+  lineinfile: 
+        dest=/etc/dnsmasq.d/10-consul 
+        line="server=/consul/127.0.0.1#8600" 
+        create=yes 
+        state=present 
+        owner=root group=root mode=0644
+  register: dnsmasq_cfg
+
+- name: dnsmasq service restart
+  service: name=dnsmasq.service state=restarted enabled=yes
+  when: dnsmasq_cfg.changed
 
 - name: Copy consul config file
   template: src=client.json.j2 dest={{ consul_cfg_dir }}/client.json owner=consul group=consul
@@ -27,13 +52,13 @@
   template: src=secret.php.j2 dest=/var/www/html/secret.php owner=root group=root mode=0644
 
 - name: Check if vault was init
-  shell: /bin/su - vault -c "vault init -check >/dev/null 2>&1"
+  shell: /bin/su - vault -c "vault init -address=http://server1.node.consul:{{ vault_port }} -check >/dev/null 2>&1"
   register: vault_init
   changed_when: vault_init.rc == 2
   failed_when: vault_init.rc == 1
   
 - name: Init vault
-  shell: /bin/su - vault -c "vault init -key-shares=1 -key-threshold=1"
+  shell: /bin/su - vault -c "vault init -address=http://server1.node.consul:{{ vault_port }} -key-shares=1 -key-threshold=1"
   register: vault_inited
   when: vault_init.changed
 
@@ -56,6 +81,16 @@
           with_items: "{{groups['servers']}}"
   when: vault_inited.changed
 
+- name: Check vault service
+  shell: /usr/bin/dig +noall +answer vault.service.consul | awk '{print $5}'
+  register: vault_ip
+
+- name: Set vault address for vault user
+  lineinfile: 
+        dest={{ vault_dir }}/.bashrc line="export VAULT_ADDR=http://vault.service.consul:{{ vault_port }}"  
+        insertafter=EOF 
+        state=present
+
 - block:
         - name: Create secret
           command: /bin/su - vault -c "vault write /secret/foo value='Top secret!'"
@@ -68,4 +103,4 @@
 
         - name: Enable userpass auth and create account
           shell: /bin/su - vault -c "vault auth-enable userpass ; vault write auth/userpass/users/{{ vault_user }} password={{ vault_password }} policies=web"
-  when: vault_init.rc != 1
+  when: vault_ip.stdout_lines[0] is defined and vault_ip.stdout_lines[0]|ipv4

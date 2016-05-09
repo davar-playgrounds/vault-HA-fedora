@@ -1,0 +1,13 @@
+{
+  "service": {
+    "name": "vault",
+    "port": {{ vault_port }},
+    "checks": [
+      { 
+        "http": "{{ vault_address }}/v1/sys/health",
+        "interval": "10s",
+        "timeout": "3s"
+      }
+    ]
+  }
+}

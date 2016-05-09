@@ -1,6 +1,3 @@
 ---
-vault_address: "http://{{ server_ips.0 }}:8200"
-
 vault_user: bugs        
-
 vault_password: bunny

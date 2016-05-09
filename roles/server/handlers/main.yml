@@ -1,0 +1,7 @@
+---
+- name: Reload consul
+  service: name=consul.service state=reloaded enabled=yes
+
+- name: Reload vault
+  service: name=vault.service state=reloaded enabled=yes
+

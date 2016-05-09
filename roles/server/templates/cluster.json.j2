@@ -10,5 +10,6 @@
   "log_level": "{{ consul_log_level }}",
   "node_name": "{{ inventory_hostname }}",
   "encrypt": "{{ consul_key }}",
-  "server": true
+  "server": true,
+  "dns_config": { "only_passing": true }
 }
