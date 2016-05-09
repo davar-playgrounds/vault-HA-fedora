@@ -31,7 +31,6 @@
   register: vault_init
   changed_when: vault_init.rc == 2
   failed_when: vault_init.rc == 1
-  ignore_errors: yes
   
 - name: Init vault
   shell: /bin/su - vault -c "vault init -key-shares=1 -key-threshold=1"
