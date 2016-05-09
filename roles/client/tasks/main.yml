@@ -87,8 +87,10 @@
         insertafter=EOF 
         state=present
 
-- name: Check vault service
-  shell: /usr/bin/dig +noall +answer vault.service.consul | awk '{print $5}'
+- name: Wait for vault service
+  shell: while [[ -z "$(/usr/bin/dig +noall +answer vault.service.consul)" ]]; do sleep 2 ; done
+  async: 20
+  poll: 4
   register: vault_ip
 
 - block:
@@ -103,4 +105,4 @@
 
         - name: Enable userpass auth and create account
           shell: /bin/su - vault -c "vault auth-enable userpass ; vault write auth/userpass/users/{{ vault_user }} password={{ vault_password }} policies=web"
-  when: vault_ip.stdout_lines[0] is defined and vault_ip.stdout_lines[0]|ipv4
+  when: vault_ip|success
