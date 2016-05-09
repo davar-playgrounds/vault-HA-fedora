@@ -9,7 +9,7 @@ This demo uses Ansible to create Vault cluster using Consul cluster as HA capabl
 
 - Install required software (as root) with: `dnf -y install vagrant-libvirt ansible`
 - Add your user account to libvirt group
-- Add FC23 cloud box for libvirt (use your own account): `vagrant box add https://download.fedoraproject.org/pub/fedora/linux/releases/23/Cloud/x86_64/Images/Fedora-Cloud-Base-Vagrant-23-20151030.x86_64.vagrant-libvirt box --name fedora-23`
+- Add FC23 cloud box for libvirt (use your own account): `vagrant box add https://download.fedoraproject.org/pub/fedora/linux/releases/23/Cloud/x86_64/Images/Fedora-Cloud-Base-Vagrant-23-20151030.x86_64.vagrant-libvirt.box --name fedora-23`
 
 ### Run the demo
 
