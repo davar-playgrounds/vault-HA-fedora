@@ -14,4 +14,4 @@ This demo uses Ansible to create Vault cluster using Consul cluster as HA capabl
 ### Run the demo
 
 - within the folder where Vagrantfile and demo.yml are located execute: `vagrant up`
-- access the demo web page upon successfull Ansible play on: http://192.168.100.104/secret.php
+- upon successfull Ansible play run a web browser on the host hosting Vagrant VMs and access the demo web page  on: http://192.168.100.104/secret.php
