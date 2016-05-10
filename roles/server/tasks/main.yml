@@ -2,9 +2,6 @@
 - name: Insert vault address for admin
   lineinfile: dest={{ vault_dir }}/.bashrc line="export VAULT_ADDR={{ vault_address }}"  insertafter=EOF state=present
 
-- name: Add vault systemd service
-  template: src=vault.service.j2 dest=/etc/systemd/system/vault.service owner=root group=root mode=0644
-
 - name: Copy vault service config
   template: src=vault_service.json.j2 dest={{ consul_cfg_dir }}/vault_service.json owner=consul group=consul
   notify: Reload consul
@@ -12,6 +9,10 @@
 - name: Copy consul config file
   template: src=cluster.json.j2 dest={{ consul_cfg_dir }}/cluster.json owner=consul group=consul
   notify: Reload consul
+
+- name: Add vault systemd service
+  template: src=vault.service.j2 dest=/etc/systemd/system/vault.service owner=root group=root mode=0644
+  notify: Reload vault
 
 - name: Copy vault config file
   template: src=vault.conf.j2 dest={{ vault_dir }}/vault.conf owner=vault group=vault

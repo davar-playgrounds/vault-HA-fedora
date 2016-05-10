@@ -4,4 +4,3 @@
 
 - name: Reload vault
   service: name=vault.service state=reloaded enabled=yes
-

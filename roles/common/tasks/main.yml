@@ -9,8 +9,10 @@
 
 - name: Install vault
   unarchive: 
-        copy=no 
-        src=https://releases.hashicorp.com/vault/0.5.2/vault_0.5.2_linux_amd64.zip dest=/usr/local/bin 
+        copy=no
+        src=https://releases.hashicorp.com/vault/0.5.2/vault_0.5.2_linux_amd64.zip
+        dest=/usr/local/bin
+        creates=/usr/local/bin/vault
         mode=0755 owner=root group=root
  
 - name: Add consul group
@@ -33,3 +35,4 @@
 
 - name: Add consul systemd service
   template: src=consul.service.j2 dest=/etc/systemd/system/consul.service owner=root group=root mode=0644
+  notify: Reload consul
