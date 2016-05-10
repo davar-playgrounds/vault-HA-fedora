@@ -88,12 +88,15 @@
         state=present
 
 - name: Wait for vault service
-  shell: while [[ -z "$(/usr/bin/dig +noall +answer vault.service.consul)" ]]; do sleep 2 ; done
-  async: 20
-  poll: 4
-  register: vault_ip
+  shell: while [[ -z "$(/usr/bin/dig +noall +answer vault.service.consul)" ]]; do sleep 5 ; done
+  async: 60
+  poll: 5
+  register: vault_ready
 
 - block:
+        - name: Enable vault syslog
+          command: /bin/su - vault -c 'vault audit-list | grep -q syslog || vault audit-enable syslog tag="vault" facility="AUTH"'
+
         - name: Create vault secret
           command: /bin/su - vault -c "vault write /secret/foo value='Top secret!'"
 
@@ -108,4 +111,4 @@
 
         - name: Create vault user
           shell: /bin/su - vault -c "vault write auth/userpass/users/{{ vault_user }} password={{ vault_password }} policies=web"
-  when: vault_ip|success
+  when: vault_ready|success
