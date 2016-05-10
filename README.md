@@ -14,5 +14,5 @@ This demo uses [Ansible](https://www.ansible.com) to create [Vault](https://www.
 
 ### Run the demo
 
-- Within the folder where Vagrantfile and demo.yml are located execute: `vagrant up`
+- Get the repository to your host and within the repository root folder where Vagrantfile and demo.yml are located execute: `vagrant up`
 - Upon successfull Ansible play run a web browser on the host hosting Vagrant VMs and access the demo web page on: http://192.168.100.104/secret.php. Follow the instructions (username and password are set in the vars section of the client role).
