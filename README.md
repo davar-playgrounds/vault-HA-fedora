@@ -1,6 +1,15 @@
 ## Introduction
 
-This demo uses [Ansible](https://www.ansible.com) to create [Vault](https://www.vaultproject.io) cluster using [Consul](https://www.consul.io) cluster as HA capable backend. Clusters are deployed on the three [cloud FC23 boxes](https://getfedora.org/en/cloud/download) hosted on [Vagrant](https://www.vagrantup.com) managed VMs. In addition, [Apache HTTPD](https://httpd.apache.org) with [PHP](https://secure.php.net) beside Consul client are installed on the fourth Vagrant VM serving a demo web page in order to demonstrate usage of Vault ("userpass" authentication used). A proper security assessment would need to be done for production deployment and required tasks accomplished accordingly (Consul authn/authz, SSL all accross with cert verification and integration to PKI, segragation of public and private networks, firewall/iptables etc.).
+Some of the common requirements of IT infrastructures are the following services:
+
+- configuration management
+- service discovery and availability management
+- passwords/secrets management
+- continous deployment management
+
+Surely, such services would need to meet the common requirements of an enterprise environment including high availability, scalability, security, auditing. This demo presents a solution based on some cool free open source products responding exactly to such requirements in an elegant and lightweight way.
+
+The demo uses [Ansible](https://www.ansible.com) to create [Vault](https://www.vaultproject.io) cluster using [Consul](https://www.consul.io) cluster as HA capable backend. Clusters are deployed on the three [cloud FC23 boxes](https://getfedora.org/en/cloud/download) hosted on [Vagrant](https://www.vagrantup.com) managed VMs. In addition, [Apache HTTPD](https://httpd.apache.org) with [PHP](https://secure.php.net) beside Consul client are installed on the fourth Vagrant VM serving a demo web page in order to demonstrate usage of Vault ("userpass" authentication used). A proper security assessment would need to be done for production deployment and required tasks accomplished accordingly (Consul authn/authz, SSL all accross with cert verification and integration to PKI, segragation of public and private networks, firewall/iptables etc.).
 
 ![alt tag](vault-HA-fedora.png) 
 
