@@ -101,7 +101,7 @@
           command: /bin/su - vault -c "vault write /secret/foo value='Top secret!'"
 
         - name: Copy vault policy file
-          copy: src=policy.hcl dest=/tmp/policy.hcl owner=vault group=vault mode=0600 mode=0644
+          copy: src=policy.hcl dest=/tmp/policy.hcl owner=vault group=vault mode=0644
 
         - name: Create vault policy
           command: /bin/su - vault -c "vault policy-write web /tmp/policy.hcl ; rm -f /tmp/policy.hcl" removes=/tmp/policy.hcl 
